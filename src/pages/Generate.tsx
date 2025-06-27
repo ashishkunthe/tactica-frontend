@@ -1,12 +1,19 @@
-import { useRef } from "react";
+import axios from "axios";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export function Generate() {
   const brandRef = useRef<HTMLInputElement>(null);
   const platformRef = useRef<HTMLInputElement>(null);
   const toneRef = useRef<HTMLInputElement>(null);
   const audienceRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const brandName = brandRef.current?.value;
@@ -14,14 +21,31 @@ export function Generate() {
     const tone = toneRef.current?.value;
     const targetAudience = audienceRef.current?.value;
 
-    console.log({
-      brandName,
-      platform,
-      tone,
-      targetAudience,
-    });
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${backendUrl}/calender/generate`,
+        {
+          brandName,
+          platform,
+          tone,
+          targetAudience,
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
 
-    // 🚀 Call backend API here
+      alert(response.data.message);
+      navigate("/calendar");
+    } catch (error: any) {
+      console.log("Something went wrong", error);
+      alert(error.response?.data?.message || "Failed to generate plan");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,10 +109,11 @@ export function Generate() {
           </div>
 
           <button
+            disabled={loading}
             type="submit"
             className="w-full bg-[#5A4FF3] hover:bg-[#4a3df0] text-white py-2 rounded-md font-medium transition"
           >
-            Generate Plan
+            {loading ? "Generating..." : "Generate Plan"}
           </button>
         </form>
       </div>
