@@ -4,21 +4,30 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Generate } from "./pages/Generate";
 import { Calender } from "./pages/Calender";
-import { Navbar } from "./components/Navbar";
-import { Footer } from "./components/Footer";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AppLayout } from "./components/AppLayout";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
       <Routes>
+        {/* Public Routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/generate" element={<Generate />} />
-        <Route path="/calendar" element={<Calender />} />
+
+        {/* Protected Routes with Navbar + Footer */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/generate" element={<Generate />} />
+          <Route path="/calendar" element={<Calender />} />
+        </Route>
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }

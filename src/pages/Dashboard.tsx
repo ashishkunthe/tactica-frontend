@@ -13,7 +13,6 @@ interface ContentPlan {
 }
 
 export function Dashboard() {
-  const [hasPlan, setHasPlan] = useState(false);
   const [content, setContent] = useState<ContentPlan | null>(null);
 
   useEffect(() => {
@@ -25,13 +24,14 @@ export function Dashboard() {
           },
         });
         const data = response.data;
-        setContent(data);
-
-        if (data !== null) {
-          setHasPlan(true);
+        if (data && data.brandName) {
+          setContent(data);
+        } else {
+          setContent(null);
         }
       } catch (error) {
         console.log("Failed to fetch calendar", error);
+        setContent(null);
       }
     }
 
@@ -47,7 +47,6 @@ export function Dashboard() {
       });
       alert(response.data.message);
       setContent(null);
-      setHasPlan(false);
     } catch (error) {
       console.log("Failed to delete", error);
       alert("Failed to delete the plan.");
@@ -61,7 +60,7 @@ export function Dashboard() {
           Welcome to Tactica
         </h2>
 
-        {hasPlan ? (
+        {content ? (
           <div className="space-y-4">
             <div className="bg-[#f5f5f5] rounded-md p-4">
               <h3 className="text-xl font-bold mb-2">Your Current Plan</h3>
