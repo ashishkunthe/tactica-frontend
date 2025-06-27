@@ -1,7 +1,58 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+interface ContentPlan {
+  _id: string;
+  brandName: string;
+  platform: string;
+  tone: string;
+  posts: any[];
+}
+
 export function Dashboard() {
-  const hasPlan = true; // 🔥 For now → toggle true/false to test UI
+  const [hasPlan, setHasPlan] = useState(false);
+  const [content, setContent] = useState<ContentPlan | null>(null);
+
+  useEffect(() => {
+    async function getCalender() {
+      try {
+        const response = await axios.get(`${backendUrl}/calender`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        });
+        const data = response.data;
+        setContent(data);
+
+        if (data !== null) {
+          setHasPlan(true);
+        }
+      } catch (error) {
+        console.log("Failed to fetch calendar", error);
+      }
+    }
+
+    getCalender();
+  }, []);
+
+  async function handleDelete(id: string | undefined) {
+    try {
+      const response = await axios.delete(`${backendUrl}/calender/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
+      alert(response.data.message);
+      setContent(null);
+      setHasPlan(false);
+    } catch (error) {
+      console.log("Failed to delete", error);
+      alert("Failed to delete the plan.");
+    }
+  }
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-[#f9f9f9] px-4">
@@ -15,13 +66,15 @@ export function Dashboard() {
             <div className="bg-[#f5f5f5] rounded-md p-4">
               <h3 className="text-xl font-bold mb-2">Your Current Plan</h3>
               <p className="text-gray-700">
-                <span className="font-semibold">Brand:</span> CodePilot
+                <span className="font-semibold">Brand:</span>
+                {content?.brandName}
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Platform:</span> Instagram
+                <span className="font-semibold">Platform:</span>{" "}
+                {content?.platform}
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Tone:</span> Witty
+                <span className="font-semibold">Tone:</span> {content?.tone}
               </p>
             </div>
 
@@ -38,7 +91,10 @@ export function Dashboard() {
               >
                 Generate New Plan
               </Link>
-              <button className="flex-1 border border-red-500 text-red-500 hover:bg-red-50 py-2 rounded-md font-medium transition">
+              <button
+                className="flex-1 border border-red-500 text-red-500 hover:bg-red-50 py-2 rounded-md font-medium transition"
+                onClick={() => handleDelete(content?._id)}
+              >
                 Delete Plan
               </button>
             </div>
