@@ -1,7 +1,14 @@
 import { Logo } from "./Logo";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export function Navbar() {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+
   return (
     <div className="flex flex-col md:flex-row items-center justify-between px-8 py-4 shadow-md bg-white gap-4">
       <Logo />
@@ -25,7 +32,10 @@ export function Navbar() {
         >
           Calendar
         </Link>
-        <button className="bg-[#5A4FF3] hover:bg-[#4a3df0] text-white px-4 py-2 rounded-md font-medium transition">
+        <button
+          className="bg-[#5A4FF3] hover:bg-[#4a3df0] text-white px-4 py-2 rounded-md font-medium transition"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </div>

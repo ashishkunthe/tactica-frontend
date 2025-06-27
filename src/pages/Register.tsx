@@ -1,25 +1,34 @@
+import axios from "axios";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export function Register() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const username = usernameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
-    console.log({
-      username,
-      email,
-      password,
-    });
-
-    // → Call your backend API here
+    try {
+      const response = await axios.post(`${backendUrl}/auth/register`, {
+        username: username,
+        email: email,
+        password: password,
+      });
+      const token = response.data.token;
+      localStorage.setItem("token", token);
+      navigate("/");
+    } catch (error) {
+      console.log("something went wrong", error);
+    }
   };
 
   return (
