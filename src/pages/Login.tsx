@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -7,6 +7,8 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export function Login() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -17,6 +19,7 @@ export function Login() {
     const password = passwordRef.current?.value;
 
     try {
+      setIsLoading(true);
       const response = await axios.post(`${backendUrl}/auth/login`, {
         email,
         password,
@@ -28,6 +31,8 @@ export function Login() {
     } catch (error) {
       console.log("something went wrong", error);
       alert("Invalid credentials or server error.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,7 +74,7 @@ export function Login() {
             type="submit"
             className="w-full bg-[#5A4FF3] hover:bg-[#4a3df0] text-white py-2 rounded-md font-medium transition"
           >
-            Login
+            {isLoading ? "Logging in..." : "login"}
           </button>
         </form>
 

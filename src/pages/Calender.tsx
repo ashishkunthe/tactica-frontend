@@ -12,6 +12,7 @@ interface Posts {
 
 export function Calender() {
   const [posts, setPosts] = useState<Posts[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCalender() {
@@ -21,12 +22,15 @@ export function Calender() {
             Authorization: localStorage.getItem("token"),
           },
         });
-        setPosts(response.data.posts);
+        setPosts(response.data.posts || []);
       } catch (error) {
         console.log("Failed to fetch calendar", error);
         setPosts([]);
+      } finally {
+        setLoading(false);
       }
     }
+
     fetchCalender();
   }, []);
 
@@ -36,9 +40,13 @@ export function Calender() {
         Your Content Calendar
       </h2>
 
-      {posts?.length > 0 ? (
+      {loading ? (
+        <div className="text-center text-gray-600 text-lg mt-20">
+          Loading...
+        </div>
+      ) : posts.length > 0 ? (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {posts?.map((post: Posts) => (
+          {posts.map((post) => (
             <div
               key={post.day}
               className="bg-white rounded-xl shadow-md p-5 flex flex-col gap-3 hover:scale-[1.02] transition"

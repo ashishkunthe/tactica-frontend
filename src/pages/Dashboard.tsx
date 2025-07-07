@@ -14,6 +14,7 @@ interface ContentPlan {
 
 export function Dashboard() {
   const [content, setContent] = useState<ContentPlan | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getCalender() {
@@ -32,6 +33,8 @@ export function Dashboard() {
       } catch (error) {
         console.log("Failed to fetch calendar", error);
         setContent(null);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -60,20 +63,22 @@ export function Dashboard() {
           Welcome to Tactica
         </h2>
 
-        {content ? (
+        {loading ? (
+          <div className="text-center text-gray-600">Loading your plan...</div>
+        ) : content ? (
           <div className="space-y-4">
             <div className="bg-[#f5f5f5] rounded-md p-4">
               <h3 className="text-xl font-bold mb-2">Your Current Plan</h3>
               <p className="text-gray-700">
-                <span className="font-semibold">Brand:</span>
-                {content?.brandName}
+                <span className="font-semibold">Brand:</span>{" "}
+                {content.brandName}
               </p>
               <p className="text-gray-700">
                 <span className="font-semibold">Platform:</span>{" "}
-                {content?.platform}
+                {content.platform}
               </p>
               <p className="text-gray-700">
-                <span className="font-semibold">Tone:</span> {content?.tone}
+                <span className="font-semibold">Tone:</span> {content.tone}
               </p>
             </div>
 
@@ -92,7 +97,7 @@ export function Dashboard() {
               </Link>
               <button
                 className="flex-1 border border-red-500 text-red-500 hover:bg-red-50 py-2 rounded-md font-medium transition"
-                onClick={() => handleDelete(content?._id)}
+                onClick={() => handleDelete(content._id)}
               >
                 Delete Plan
               </button>

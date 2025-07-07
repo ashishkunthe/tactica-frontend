@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -8,6 +8,8 @@ export function Register() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,6 +20,7 @@ export function Register() {
     const password = passwordRef.current?.value;
 
     try {
+      setIsLoading(true);
       const response = await axios.post(`${backendUrl}/auth/register`, {
         username: username,
         email: email,
@@ -28,6 +31,8 @@ export function Register() {
       navigate("/");
     } catch (error) {
       console.log("something went wrong", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,7 +87,7 @@ export function Register() {
             type="submit"
             className="w-full bg-[#5A4FF3] hover:bg-[#4a3df0] text-white py-2 rounded-md font-medium transition"
           >
-            Register
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
 
